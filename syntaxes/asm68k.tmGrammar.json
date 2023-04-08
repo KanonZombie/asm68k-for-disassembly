@@ -1,0 +1,29 @@
+{
+    "name": "asm68k",
+    "scopeName": "source.asm68k",
+    "patterns": [
+        {
+            "include": "#label"
+        },
+        {
+            "include": "#comment"
+        },
+        {
+            "include": "#instruction"
+        }
+    ],
+    "repository": {
+        "label": {
+            "match": "^(\\w+):",
+            "name": "entity.name.label.asm68000"
+        },
+        "comment": {
+            "match": ";.*$",
+            "name": "comment.line.semicolon.asm68000"
+        },
+        "instruction": {
+            "match": "\\b(ADD|ADDI|AND|ANDI|BCC|BCS|BEQ|BGE|BGT|BHI|BLE|BLS|BLT|BMI|BNE|BPL|BRA|BSR|BVC|BVS|CLR|CMP|CMPI|DBCC|DBCS|DBEQ|DBGE|DBGT|DBHI|DBLE|DBLS|DBLT|DBMI|DBNE|DBPL|DBRA|DBSR|DBT|DBVC|DBVS|DIVS|DIVU|EOR|EORI|EXG|EXT|ILLEGAL|JMP|JSR|LEA|LINK|LSL|LSR|MOVE|MOVEA|MOVEC|MOVEM|MULS|MULU|NBCD|NEG|NEGX|NOP|NOT|OR|ORI|PEA|RESET|RTE|RTS|SBCD|STOP|SUB|SUBI|SWAP|TAS|TRAP|TRAPV|TST|UNLK)\\b",
+            "name": "keyword.control.asm68000"
+        }
+    }
+}

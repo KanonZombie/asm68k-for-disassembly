@@ -1,0 +1,91 @@
+{
+    "name": "asm68k-for-disassembly",
+    "displayName": "asm68k for disassembly",
+    "description": "Desc for asm68k for disassembly",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.77.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [],
+    "main": "./out/extension.js",
+    "contributes": {
+        "languages": [
+            {
+                "id": "asm68k",
+                "extensions": [
+                    ".68k",
+                    ".asm"
+                ]
+            }
+        ],
+        "grammars": [
+            {
+                "language": "asm68k",
+                "scopeName": "source.asm68k",
+                "path": "./syntaxes/asm68k.tmGrammar.json"
+            }
+        ],
+        "themes": [
+            {
+                "label": "ASM 68000 Color Theme",
+                "uiTheme": "vs-dark",
+                "path": "./themes/asm68k-color-theme.json"
+            }
+        ],
+        "configuration": {
+            "properties": {
+                "myExtension.keywords": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [
+                        "Dragon Ball Z",
+                        "Saiyan",
+                        "Kamehameha",
+                        "Cell",
+                        "Frieza",
+                        "Majin Buu"
+                    ],
+                    "description": "The list of keywords to highlight."
+                }
+            }
+        },
+        "commands": [
+            {
+                "command": "asm68k-for-disassembly.helloWorld",
+                "title": "Hello World"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "pretest": "npm run compile && npm run lint",
+        "lint": "eslint src --ext ts",
+        "test": "node ./out/test/runTest.js"
+    },
+    "devDependencies": {
+        "@types/glob": "^8.1.0",
+        "@types/mocha": "^10.0.1",
+        "@types/node": "16.x",
+        "@types/vscode": "^1.77.0",
+        "@typescript-eslint/eslint-plugin": "^5.56.0",
+        "@typescript-eslint/parser": "^5.56.0",
+        "@vscode/test-electron": "^2.3.0",
+        "eslint": "^8.36.0",
+        "glob": "^8.1.0",
+        "mocha": "^10.2.0",
+        "typescript": "^4.9.5"
+    },
+    "dependencies": {
+        "tiny-worker": "^2.3.0",
+        "vscode-languageclient": "^8.1.0",
+        "vscode-languageserver": "^8.1.0",
+        "vscode-languageserver-textdocument": "^1.0.8"
+    }
+}

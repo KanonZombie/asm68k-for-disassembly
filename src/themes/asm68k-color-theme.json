@@ -1,0 +1,16 @@
+{
+    "name": "asm68k",
+    "type": "dark",
+    "colors": {
+        "editor.background": "#1E1E1E",
+        "editor.foreground": "#c70606"
+    },
+    "tokenColors": [
+        {
+            "scope": "entity.name.label.asm68000",
+            "settings": {
+                "foreground": "#FFA07A"
+            }
+        }
+    ]
+}
