@@ -6,10 +6,10 @@
     "engines": {
         "vscode": "^1.77.0"
     },
-    "categories": [
-        "Other"
+    "categories": ["Formatters", "Other"],
+    "activationEvents": [
+        "onLanguage:asm68k"
     ],
-    "activationEvents": [],
     "main": "./out/extension.js",
     "contributes": {
         "languages": [
@@ -28,29 +28,13 @@
                 "path": "./syntaxes/asm68k.tmGrammar.json"
             }
         ],
-        "themes": [
-            {
-                "label": "ASM 68000 Color Theme",
-                "uiTheme": "vs-dark",
-                "path": "./themes/asm68k-color-theme.json"
-            }
-        ],
         "configuration": {
+            "title": "ASM 68k",
             "properties": {
-                "myExtension.keywords": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "default": [
-                        "Dragon Ball Z",
-                        "Saiyan",
-                        "Kamehameha",
-                        "Cell",
-                        "Frieza",
-                        "Majin Buu"
-                    ],
-                    "description": "The list of keywords to highlight."
+                "asm68k.format.enable": {
+                  "type": "boolean",
+                  "default": true,
+                  "description": "Allow formatter"
                 }
             }
         },
