@@ -24,28 +24,6 @@ export class Asm68000Formatter implements vscode.DocumentFormattingEditProvider 
         }
     
         return edits;
-        
-        //const edits: vscode.TextEdit[] = [];
-
-        for (let i = 0; i < document.lineCount; i++) {
-            const line = document.lineAt(i);
-
-            // Ignora las líneas vacías
-            if (line.isEmptyOrWhitespace) {
-                continue;
-            }
-
-            const originalText = line.text;
-            const formattedText = this.formatLineDC(originalText);
-
-            if (originalText !== formattedText) {
-                const range = new vscode.Range(line.range.start, line.range.end);
-                const edit = vscode.TextEdit.replace(range, formattedText);
-                edits.push(edit);
-            }
-        }
-
-        return edits;
     }
 
     private additionalFormatting(line: string, document: vscode.TextDocument): string {
@@ -70,8 +48,26 @@ export class Asm68000Formatter implements vscode.DocumentFormattingEditProvider 
         // Coincide con las instrucciones y los operandos según las especificaciones
         return line.replace(/^(\s*)(dc|dcb)\.([sbwlSBWL])(\s+)([^;]+)(\s*;.*)?$/, (match, initialSpaces, instruction, modifier, commandOperandSpace, operands, comment) => {
             const formattedOperands = operands.trim().replace(/\s{2,}/g, ' ');
-            const formattedComment = comment ? '\t' + comment : '';
-            return `${initialSpaces}${instruction.toLowerCase()}.${modifier.toLowerCase()}${commandOperandSpace}${formattedOperands}${formattedComment}`;
+
+            // Calcula la cantidad de espacios necesarios para que el comentario comience en la columna correcta
+            const columnForCommentShort = 35;
+            const columnForCommentLong = 60;
+            const tabSize = 4;
+            const lineWithoutComment = `${initialSpaces}${instruction.toLowerCase()}.${modifier.toLowerCase()}${commandOperandSpace}${formattedOperands}`;
+            const lineLength = lineWithoutComment.replace(/\t/g, ' '.repeat(tabSize)).length;
+            
+            let columnForComment;
+            if (lineLength < 31) {
+                columnForComment = columnForCommentShort;
+            } else if (lineLength < 56) {
+                columnForComment = columnForCommentLong;
+            }
+
+            const spacesNeeded = columnForComment ? columnForComment - lineLength : 0;
+            const spacesForAlignment = spacesNeeded > 0 ? ' '.repeat(spacesNeeded) : ' '.repeat(4);
+
+            const formattedComment = comment ? spacesForAlignment + comment : '';
+            return `${lineWithoutComment}${formattedComment}`;
         });
     }
 }

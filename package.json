@@ -1,12 +1,17 @@
 {
+    "publisher": "KanonZombie",
     "name": "asm68k-for-disassembly",
     "displayName": "asm68k for disassembly",
     "description": "Desc for asm68k for disassembly",
     "version": "0.0.1",
     "engines": {
-        "vscode": "^1.77.0"
+        "vscode": "^1.78.0"
     },
-    "categories": ["Formatters", "Other"],
+    "categories": [
+        "Formatters",
+        "Themes",
+        "Other"
+    ],
     "activationEvents": [
         "onLanguage:asm68k"
     ],
@@ -32,9 +37,9 @@
             "title": "ASM 68k",
             "properties": {
                 "asm68k.format.enable": {
-                  "type": "boolean",
-                  "default": true,
-                  "description": "Allow formatter"
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Allow formatter"
                 }
             }
         },
@@ -44,6 +49,21 @@
                 "title": "Hello World"
             }
         ]
+    },
+    "configurationDefaults": {
+        "asm68k": {
+            "editor.semanticHighlighting.enabled": true,
+            "editor.tokenColorCustomizations": {
+                "textMateRules": [
+                    {
+                        "scope": "entity.name.label.asm68000",
+                        "settings": {
+                            "foreground": "#f00"
+                        }
+                    }
+                ]
+            }
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
