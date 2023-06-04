@@ -17,12 +17,15 @@ export class Asm68000Formatter implements vscode.DocumentFormattingEditProvider 
                 continue;
             }
 
-            const additionalFormattedLine = this.additionalFormatting(line.text, document);
-            const formattedLine = this.formatLineDC(additionalFormattedLine);
+            let formattedLine = this.additionalFormatting(line.text, document);
+            formattedLine = this.alignOperands(formattedLine);
+            formattedLine = this.formatInstructionAndOperands(formattedLine);
+            formattedLine = this.alignComments(formattedLine);
             const edit = vscode.TextEdit.replace(line.range, formattedLine);
+
             edits.push(edit);
         }
-    
+
         return edits;
     }
 
@@ -30,34 +33,77 @@ export class Asm68000Formatter implements vscode.DocumentFormattingEditProvider 
         const options = vscode.workspace.getConfiguration('editor', document.uri);
         const insertSpaces = options.get<boolean>('insertSpaces');
         const tabSize = options.get<number>('tabSize');
-        
+
         const leadingWhitespace = line.match(/^\s*/)?.[0] ?? '';
-    
+
         let newIndentation = '';
         if (insertSpaces) {
-            newIndentation = ' '.repeat( (tabSize ?? 4 )* leadingWhitespace.length);
+            newIndentation = ' '.repeat((tabSize ?? 4) * leadingWhitespace.length);
         } else {
-            newIndentation = '\t'.repeat(Math.ceil(leadingWhitespace.length / (tabSize ?? 4 )));
+            newIndentation = '\t'.repeat(Math.ceil(leadingWhitespace.length / (tabSize ?? 4)));
         }
-    
+
         return line.replace(/^\s*/, newIndentation);
     }
-    
-    private formatLineDC(line: string): string {
-        // Convierte las instrucciones a mayúsculas y elimina los espacios adicionales alrededor de los operandos
-        // Coincide con las instrucciones y los operandos según las especificaciones
-        return line.replace(/^(\s*)(dc|dcb)\.([sbwlSBWL])(\s+)([^;]+)(\s*;.*)?$/, (match, initialSpaces, instruction, modifier, commandOperandSpace, operands, comment) => {
-            const formattedOperands = operands.trim().replace(/\s{2,}/g, ' ');
 
-            // Calcula la cantidad de espacios necesarios para que el comentario comience en la columna correcta
-            const columnForCommentShort = 35;
-            const columnForCommentLong = 60;
-            const tabSize = 4;
-            const lineWithoutComment = `${initialSpaces}${instruction.toLowerCase()}.${modifier.toLowerCase()}${commandOperandSpace}${formattedOperands}`;
+    private alignOperands(line: string): string {
+        const firstNonWhitespaceIndex = line.search(/\S/);
+        const instructionStartIndex = line.slice(firstNonWhitespaceIndex).search(/\s/);
+        if (instructionStartIndex === -1) {
+            // This line doesn't have an operand, so return it as is.
+            return line;
+        }
+
+        if (line.trimStart().indexOf(';') === 0 || line.trimStart() === '') {
+            // This line doesn't have an operand, so return it as is.
+            return line;
+        }
+
+        const initialWhitespace = line.slice(0, firstNonWhitespaceIndex);
+        const instruction = line.slice(firstNonWhitespaceIndex, firstNonWhitespaceIndex + instructionStartIndex);
+        const operands = line.slice(firstNonWhitespaceIndex + instructionStartIndex).trim();
+
+        // Calculate the number of spaces needed to align operands to the 15th column.
+        const spacesNeeded = 10 - instruction.length;
+
+        // If the instruction is longer than 14 characters, use a single space.
+        const spacesForAlignment = spacesNeeded > 0 ? ' '.repeat(spacesNeeded) : ' ';
+
+        return `${initialWhitespace}${instruction}${spacesForAlignment}${operands}`;
+    }
+
+    private formatInstructionAndOperands(line: string): string {
+        return line.replace(/^(\s*)(dc|dcb)\.([sbwlSBWL])(\s+)([^;]+)(\s*;.*)?$/, (match, initialSpaces, instruction, modifier, commandOperandSpace, operands, comment) => {
+            const formattedOperands = operands.trim();
+
+            const formattedComment = comment ? comment : '';
+
+            const formattedLine = `${initialSpaces}${instruction.toLowerCase()}.${modifier.toLowerCase()}${commandOperandSpace}${formattedOperands}${formattedComment}`;
+
+            return formattedLine;
+        });
+    }
+
+    private alignComments(originalLine: string): string {
+        const columnForCommentShort = 35;
+        const columnForCommentLong = 60;
+        const tabSize = 4;
+        const commentMatch = originalLine.match(/(.+?)(;.*)/);
+
+        let lineWithoutComment = originalLine;
+        let formattedComment = '';
+
+        if (commentMatch) {
+            const comment = commentMatch ? commentMatch[2] : '';
+
+            lineWithoutComment = commentMatch ? commentMatch[1].trimEnd() : '';;
             const lineLength = lineWithoutComment.replace(/\t/g, ' '.repeat(tabSize)).length;
-            
+
             let columnForComment;
-            if (lineLength < 31) {
+            if (lineLength === 0) {
+                return originalLine;
+            }
+            else if (lineLength < 31) {
                 columnForComment = columnForCommentShort;
             } else if (lineLength < 56) {
                 columnForComment = columnForCommentLong;
@@ -66,8 +112,10 @@ export class Asm68000Formatter implements vscode.DocumentFormattingEditProvider 
             const spacesNeeded = columnForComment ? columnForComment - lineLength : 0;
             const spacesForAlignment = spacesNeeded > 0 ? ' '.repeat(spacesNeeded) : ' '.repeat(4);
 
-            const formattedComment = comment ? spacesForAlignment + comment : '';
-            return `${lineWithoutComment}${formattedComment}`;
-        });
+            formattedComment = comment ? spacesForAlignment + comment : '';
+
+        }
+
+        return `${lineWithoutComment}${formattedComment}`;
     }
 }
